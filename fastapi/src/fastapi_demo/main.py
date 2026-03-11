@@ -1,11 +1,18 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="Helpdesk Tickets")
+from fastapi_demo import db
 
-# In-memory store
-tickets: dict[int, dict] = {}
-_next_id = 1
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db.init_db()
+    yield
+
+
+app = FastAPI(title="Helpdesk Tickets", lifespan=lifespan)
 
 
 class TicketCreate(BaseModel):
@@ -21,27 +28,23 @@ class Ticket(TicketCreate):
 
 @app.post("/tickets", response_model=Ticket, status_code=201)
 def create_ticket(body: TicketCreate):
-    global _next_id
-    ticket = Ticket(id=_next_id, **body.model_dump())
-    tickets[_next_id] = ticket.model_dump()
-    _next_id += 1
-    return ticket
+    return db.create_ticket(**body.model_dump())
 
 
 @app.get("/tickets", response_model=list[Ticket])
 def list_tickets():
-    return list(tickets.values())
+    return db.list_tickets()
 
 
 @app.get("/tickets/{ticket_id}", response_model=Ticket)
 def get_ticket(ticket_id: int):
-    if ticket_id not in tickets:
+    ticket = db.get_ticket(ticket_id)
+    if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    return tickets[ticket_id]
+    return ticket
 
 
 @app.delete("/tickets/{ticket_id}", status_code=204)
 def delete_ticket(ticket_id: int):
-    if ticket_id not in tickets:
+    if not db.delete_ticket(ticket_id):
         raise HTTPException(status_code=404, detail="Ticket not found")
-    del tickets[ticket_id]
