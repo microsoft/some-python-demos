@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  run:
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - uv run fastapi-demo --frozen
