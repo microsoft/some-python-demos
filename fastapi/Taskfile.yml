@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  check:
+    cmds:
+      - uv run --frozen ruff check .
+      - uv run --frozen ty check .
+  format:
+    cmds:
+      - uv run --frozen ruff check . --fix
+  test:
+    cmds:
+      - uv run --frozen pytest
+  run:
+    dir: '{{.USER_WORKING_DIR}}'
+    cmds:
+      - uv run --frozen fastapi-demo
