@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:
+  check:
+    cmds:
+      - uv run --frozen ruff check .
+      - uv run --frozen ty check .
+  format:
+    cmds:
+      - uv run --frozen ruff check . --fix
+  run:
+    cmds:
+      - uv run --frozen maf
