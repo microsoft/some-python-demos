@@ -4,12 +4,9 @@ A python package that runs a fastapi server!
 
 ## requirements
 
-- uv
+- uv -- <https://docs.astral.sh/uv/getting-started/installation/>
+- task -- <https://taskfile.dev/docs/installation>
 
 ## quickstart
 
-```shell
-uv init --package --name=fastapi-demo
-uv add ruff ty --dev
-uv add fastapi
-```
+See Taskfile for all the common operations, like `task check`, `task test`, and `task run`.
