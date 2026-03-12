@@ -1,0 +1,30 @@
+[project]
+name = "maf"
+version = "0.1.0"
+description = "Microsoft Agent Framework demo with FastAPI"
+readme = "README.md"
+authors = [
+    { name = "dtklein7", email = "kleindavid@microsoft.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "agent-framework",
+    "azure-identity",
+    "fastapi>=0.135.1",
+    "httpx>=0.28.0",
+    "pydantic-settings>=2.13.0",
+    "uvicorn>=0.41.0",
+]
+
+[project.scripts]
+maf = "maf:main"
+
+[build-system]
+requires = ["uv_build>=0.10.6,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.5",
+    "ty>=0.0.22",
+]
