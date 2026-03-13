@@ -48,6 +48,21 @@ def get_ticket(ticket_id: int) -> dict | None:
         return dict(row) if row else None
 
 
+def update_ticket(ticket_id: int, **fields: str) -> dict | None:
+    if not fields:
+        return None
+    columns = ", ".join(f"{col} = ?" for col in fields)
+    values = list(fields.values()) + [ticket_id]
+    with _connect() as conn:
+        cursor = conn.execute(
+            f"UPDATE tickets SET {columns} WHERE id = ?",  # noqa: S608
+            values,
+        )
+        if cursor.rowcount == 0:
+            return None
+        return get_ticket(ticket_id)
+
+
 def delete_ticket(ticket_id: int) -> bool:
     with _connect() as conn:
         cursor = conn.execute("DELETE FROM tickets WHERE id = ?", (ticket_id,))
