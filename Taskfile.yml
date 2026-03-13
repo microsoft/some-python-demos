@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:
+  maf-demo:
+    dir: ./maf
+    cmds:
+      - uv run --frozen maf
+  fastapi-demo:
+    dir: ./fastapi
+    cmds:
+      - uv run --frozen fastapi-demo
+  demo:
+    deps: [fastapi-demo, maf-demo]

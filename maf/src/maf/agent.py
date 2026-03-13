@@ -1,15 +1,16 @@
 import httpx
-from agent_framework import ai_function
+from agent_framework import tool
 from agent_framework.azure import AzureOpenAIResponsesClient
 from azure.identity import AzureCliCredential
 
 from maf.settings import get_settings
 
+settings = get_settings()
 
-@ai_function
+
+@tool
 def read_tickets() -> str:
     """Read all helpdesk tickets from the ticketing system."""
-    settings = get_settings()
     with httpx.Client(timeout=10) as client:
         response = client.get(f"{settings.tickets_api_base}/tickets")
         response.raise_for_status()
@@ -21,21 +22,18 @@ def read_tickets() -> str:
     lines = []
     for t in tickets:
         lines.append(
-            f"- Ticket #{t['id']}: [{t['priority']}] {t['subject']} "
-            f"(status: {t['status']})\n  {t['description']}"
+            f"- Ticket #{t['id']}: [{t['priority']}] {t['subject']} (status: {t['status']})\n  {t['description']}"
         )
     return "\n".join(lines)
 
 
 def create_agent():
-    settings = get_settings()
     credential = AzureCliCredential()
-    client = AzureOpenAIResponsesClient(
+    return AzureOpenAIResponsesClient(
         endpoint=settings.azure_openai_endpoint,
         deployment_name=settings.azure_openai_deployment_name,
         credential=credential,
-    )
-    return client.create_agent(
+    ).as_agent(
         name="HelpdeskAgent",
         instructions=(
             "You are a helpful helpdesk assistant. You can read tickets from the "

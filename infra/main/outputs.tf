@@ -19,3 +19,9 @@ output "ai_foundry_hub_name" {
 output "ai_foundry_project_name" {
   value = azurerm_ai_foundry_project.main.name
 }
+
+output "application_insights_connection_string" {
+  description = "Application Insights connection string."
+  value       = azurerm_application_insights.main.connection_string
+  sensitive   = true
+}
