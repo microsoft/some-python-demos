@@ -1,10 +1,23 @@
 import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from agent_framework.observability import create_resource, enable_instrumentation
+from azure.monitor.opentelemetry import configure_azure_monitor
 from pydantic import BaseModel
 
+from fastapi import FastAPI
 from maf.agent import create_agent
+
+# Configure Azure Monitor first
+configure_azure_monitor(
+    connection_string="InstrumentationKey=...",
+    resource=create_resource(),  # Uses OTEL_SERVICE_NAME, etc.
+    enable_live_metrics=True,
+)
+
+# Then activate Agent Framework's telemetry code paths
+# This is optional if ENABLE_INSTRUMENTATION and/or ENABLE_SENSITIVE_DATA are set in env vars
+enable_instrumentation(enable_sensitive_data=False)
 
 threads: dict = {}
 agent = None

@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     azure_openai_endpoint: str | None = None
     azure_openai_deployment_name: str = "gpt-4o"
     tickets_api_base: str = "http://localhost:8000"
+    appinsights_connection_string: str | None = None
+    appinsights_instrumentation_key: str | None = None
 
 
 @lru_cache

@@ -66,11 +66,13 @@ resource "azurerm_key_vault" "main" {
 }
 
 resource "azurerm_storage_account" "main" {
-  name                     = "st${var.prefix}"
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                            = "st${var.prefix}"
+  resource_group_name             = azurerm_resource_group.main.name
+  location                        = azurerm_resource_group.main.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  allow_nested_items_to_be_public = false
+  shared_access_key_enabled       = false
 }
 
 # ---------------------------------------------------------------------------
@@ -90,6 +92,7 @@ resource "azurerm_cognitive_account" "openai" {
 resource "azurerm_cognitive_deployment" "gpt4o" {
   name                 = "gpt-4o"
   cognitive_account_id = azurerm_cognitive_account.openai.id
+  rai_policy_name      = "Microsoft.DefaultV2" 
 
   model {
     format  = "OpenAI"
@@ -108,11 +111,12 @@ resource "azurerm_cognitive_deployment" "gpt4o" {
 # ---------------------------------------------------------------------------
 
 resource "azurerm_ai_foundry" "main" {
-  name                = "hub-${var.prefix}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  storage_account_id  = azurerm_storage_account.main.id
-  key_vault_id        = azurerm_key_vault.main.id
+  name                   = "hub-${var.prefix}"
+  location               = azurerm_resource_group.main.location
+  resource_group_name    = azurerm_resource_group.main.name
+  storage_account_id     = azurerm_storage_account.main.id
+  key_vault_id           = azurerm_key_vault.main.id
+  public_network_access  = "Disabled"
 
   identity {
     type = "SystemAssigned"
@@ -127,6 +131,26 @@ resource "azurerm_ai_foundry_project" "main" {
   identity {
     type = "SystemAssigned"
   }
+}
+
+# ---------------------------------------------------------------------------
+# Application Insights (workspace-based)
+# ---------------------------------------------------------------------------
+
+resource "azurerm_log_analytics_workspace" "main" {
+  name                = "log-${var.prefix}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_application_insights" "main" {
+  name                = "appi-${var.prefix}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  workspace_id        = azurerm_log_analytics_workspace.main.id
+  application_type    = "web"
 }
 
 # ---------------------------------------------------------------------------
