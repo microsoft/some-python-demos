@@ -49,7 +49,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    session_id: str
+    session_id: str | None
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -58,16 +58,10 @@ async def chat(body: ChatRequest):
         raise RuntimeError("Agent unset.")
 
     if body.session_id:
-        session_id = body.session_id
+        session = agent.get_session(service_session_id=body.session_id)
     else:
-        session_id = str(uuid.uuid4())
-    
-    if session_id not in sessions:
-        sessions[session_id] = [Message("user", body.message)]
-    else:
-        sessions[session_id].append(Message("user", body.message))
+        session = agent.create_session()
 
-    result = await agent.run(sessions[session_id], session_id=session_id)
-    sessions[session_id].append(Message("system", result.text))
+    result = await agent.run(body.message, session=session)
 
-    return ChatResponse(reply=result.text, session_id=session_id)
+    return ChatResponse(reply=result.text, session_id=result.response_id)
