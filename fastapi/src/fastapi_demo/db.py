@@ -33,7 +33,8 @@ def create_ticket(subject: str, description: str, priority: str = "medium") -> d
             "INSERT INTO tickets (subject, description, priority) VALUES (?, ?, ?)",
             (subject, description, priority),
         )
-        return get_ticket(cursor.lastrowid)  # type: ignore[arg-type]
+        ticket_id = cursor.lastrowid
+    return get_ticket(ticket_id)  # type: ignore[arg-type]
 
 
 def list_tickets() -> list[dict]:

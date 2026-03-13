@@ -9,5 +9,9 @@ tasks:
     dir: ./fastapi
     cmds:
       - uv run --frozen fastapi-demo
+  frontend:
+    dir: ./frontend
+    cmds:
+      - npm run dev
   demo:
-    deps: [fastapi-demo, maf-demo]
+    deps: [fastapi-demo, maf-demo, frontend]
