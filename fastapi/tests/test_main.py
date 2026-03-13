@@ -117,3 +117,48 @@ def test_create_ticket_calls_db_with_correct_args(mock_db):
         json={"subject": "Bug Report", "description": "Found a bug", "priority": "low"},
     )
     mock_db.create_ticket.assert_called_once_with(subject="Bug Report", description="Found a bug", priority="low")
+
+
+def test_update_ticket_status(mock_db):
+    mock_db.update_ticket.return_value = {
+        "id": 1,
+        "subject": "Test Subject",
+        "description": "Test Description",
+        "priority": "medium",
+        "status": "closed",
+    }
+    response = client.patch("/tickets/1", json={"status": "closed"})
+    assert response.status_code == 200
+    assert response.json()["status"] == "closed"
+    mock_db.update_ticket.assert_called_once_with(1, status="closed")
+
+
+def test_update_ticket_multiple_fields(mock_db):
+    mock_db.update_ticket.return_value = {
+        "id": 1,
+        "subject": "Updated",
+        "description": "Test Description",
+        "priority": "high",
+        "status": "in_progress",
+    }
+    response = client.patch("/tickets/1", json={"subject": "Updated", "priority": "high", "status": "in_progress"})
+    assert response.status_code == 200
+    assert response.json()["subject"] == "Updated"
+    assert response.json()["status"] == "in_progress"
+
+
+def test_update_ticket_not_found(mock_db):
+    mock_db.update_ticket.return_value = None
+    response = client.patch("/tickets/999", json={"status": "closed"})
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Ticket not found"
+
+
+def test_update_ticket_no_fields():
+    response = client.patch("/tickets/1", json={})
+    assert response.status_code == 422
+
+
+def test_update_ticket_invalid_status():
+    response = client.patch("/tickets/1", json={"status": "invalid"})
+    assert response.status_code == 422
