@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Helpdesk &amp; Chat</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Left panel: Tickets -->
+      <section id="tickets-panel" class="panel">
+        <h2>Helpdesk Tickets</h2>
+        <div id="tickets-toolbar">
+          <button id="btn-new-ticket">+ New Ticket</button>
+          <select id="filter-status">
+            <option value="all">All Statuses</option>
+            <option value="not_closed" selected>Hide Closed</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div id="new-ticket-form" class="hidden">
+          <input id="new-subject" type="text" placeholder="Subject" />
+          <textarea id="new-description" placeholder="Description"></textarea>
+          <select id="new-priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+          <div class="form-actions">
+            <button id="btn-submit-ticket">Create</button>
+            <button id="btn-cancel-ticket" class="secondary">Cancel</button>
+          </div>
+        </div>
+        <ul id="tickets-list"></ul>
+      </section>
+
+      <!-- Right panel: Chat -->
+      <section id="chat-panel" class="panel">
+        <h2>Chat Bot</h2>
+        <div id="chat-messages"></div>
+        <form id="chat-form">
+          <input
+            id="chat-input"
+            type="text"
+            placeholder="Type a message…"
+            autocomplete="off"
+          />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
